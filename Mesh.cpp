@@ -1,4 +1,5 @@
 #include "Mesh.h"
+#include "RayTracing.h"
 #include <fstream>
 #include <stdexcept>
 #include <vector>
@@ -315,6 +316,10 @@ std::string Mesh::GetName() {
 	return name;
 }
 
+const MeshRayTracingData& Mesh::getRayTracingData() {
+	return rayTracingData;
+}
+
 void Mesh::CreateBuffers(Vertex vertices[], unsigned int indices[], int vertexCount, int indexCount) 
 {
 	// Create vertex buffer
@@ -330,6 +335,8 @@ void Mesh::CreateBuffers(Vertex vertices[], unsigned int indices[], int vertexCo
 	ibView.Format = DXGI_FORMAT_R32_UINT;
 	ibView.SizeInBytes = sizeof(unsigned int) * indexCount;
 	ibView.BufferLocation = indexBuffer->GetGPUVirtualAddress();
+
+	rayTracingData = RayTracing::CreateBottomLevelAccelerationStructureForMesh(this);
 }
 
 // --------------------------------------------------------

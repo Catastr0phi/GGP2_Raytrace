@@ -23,3 +23,10 @@ struct PixelShaderExternalData
 	DirectX::XMFLOAT3 camPosition;
 	int lightCount;
 };
+
+struct RaytracingSceneData
+{
+	DirectX::XMFLOAT4X4 InverseViewProjection;
+	DirectX::XMFLOAT3 CmaeraPosition;
+	float pad;
+};
