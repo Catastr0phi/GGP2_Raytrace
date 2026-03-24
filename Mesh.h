@@ -8,6 +8,13 @@
 #include <string>
 
 
+struct MeshRayTracingData
+{
+	D3D12_GPU_DESCRIPTOR_HANDLE IndexBufferSRV{};
+	D3D12_GPU_DESCRIPTOR_HANDLE VertexBufferSRV{};
+	Microsoft::WRL::ComPtr<ID3D12Resource> BLAS;
+};
+
 class Mesh 
 {
 // Private data
@@ -42,12 +49,5 @@ public:
 	int GetVertexCount();
 	std::string GetName();
 	void CalculateTangents(Vertex* verts, int numVerts, unsigned int* indices, int numIndices);
-	const MeshRayTracingData& getRayTracingData();
-};
-
-struct MeshRayTracingData
-{
-	D3D12_GPU_DESCRIPTOR_HANDLE IndexBufferSRV {};
-	D3D12_GPU_DESCRIPTOR_HANDLE VertexBufferSRV{};
-	Microsoft::WRL::ComPtr<ID3D12Resource> BLAS;
+	const MeshRayTracingData& GetRayTracingData();
 };

@@ -26,7 +26,6 @@ private:
 
 	// Initialization helper methods - feel free to customize, combine, remove, etc.
 	void CreateGeometry();
-	void CreateRootSigAndPipelineState();
 
 	// Note the usage of ComPtr below
 	//  - This is a smart pointer for objects that abide by the
@@ -59,7 +58,7 @@ private:
 
 	// Camera and assets
 	std::shared_ptr<Camera> cam;
-	std::vector<GameEntity> entities;
+	std::vector<std::shared_ptr<GameEntity>> entities;
 	std::vector<std::shared_ptr<Mesh>> meshes;
 	std::vector<Light> lights;
 };

@@ -316,7 +316,7 @@ std::string Mesh::GetName() {
 	return name;
 }
 
-const MeshRayTracingData& Mesh::getRayTracingData() {
+const MeshRayTracingData& Mesh::GetRayTracingData() {
 	return rayTracingData;
 }
 

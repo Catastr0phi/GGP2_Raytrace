@@ -27,6 +27,6 @@ struct PixelShaderExternalData
 struct RaytracingSceneData
 {
 	DirectX::XMFLOAT4X4 InverseViewProjection;
-	DirectX::XMFLOAT3 CmaeraPosition;
+	DirectX::XMFLOAT3 CameraPosition;
 	float pad;
 };
