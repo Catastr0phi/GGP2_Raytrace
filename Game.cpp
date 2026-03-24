@@ -164,21 +164,20 @@ void Game::CreateGeometry()
 	woodMat->SetTextureIndex(woodMetallic);
 
 	// Create entities
-	//entities.push_back(std::make_shared<GameEntity>(cube, cobbleMat));
-	//entities.push_back(std::make_shared<GameEntity>(sphere, floorMat));
+	entities.push_back(std::make_shared<GameEntity>(cube, cobbleMat));
+	entities.push_back(std::make_shared<GameEntity>(sphere, floorMat));
 	entities.push_back(std::make_shared<GameEntity>(helix, woodMat));
 
-	//entities[0].get()->GetTransform()->MoveAbsolute(5, 0, 5);
-	entities[0].get()->GetTransform()->MoveAbsolute(0, 0, 5);
-	//entities[2].get()->GetTransform()->MoveAbsolute(-5, 0, 5);
+	entities[0].get()->GetTransform()->MoveAbsolute(5, 0, 5);
+	entities[1].get()->GetTransform()->MoveAbsolute(0, 0, 5);
+	entities[2].get()->GetTransform()->MoveAbsolute(-5, 0, 5);
 
-	RayTracing::CreateTopLevelAccelerationStructureForScene(entities[0]);
-	//RayTracing::CreateTopLevelAccelerationStructureForScene(entities[1]);
-	//RayTracing::CreateTopLevelAccelerationStructureForScene(entities[2]);
+	RayTracing::CreateEntityDataBuffer(entities);
+	RayTracing::CreateTopLevelAccelerationStructureForScene(entities);
 
 	Graphics::CloseAndExecuteCommandList();
 	Graphics::WaitForGPU();
-	Graphics::ResetAllocatorAndCommandList(Graphics::SwapChainIndex());
+	Graphics::ResetAllocatorAndCommandList(0);
 
 	// Create camera
 	cam = std::make_shared<Camera>(XMFLOAT3(0.0f, 0.0f, -1.0f), 5.0f, 1.0f, XM_PIDIV2, Window::AspectRatio());
@@ -295,8 +294,8 @@ void Game::Update(float deltaTime, float totalTime)
 
 	cam->Update(deltaTime);
 
-	entities[0].get()->GetTransform()->Rotate(DirectX::XMFLOAT3(0, 1 * deltaTime, 0));
-	//entities[2].get()->GetTransform()->Rotate(DirectX::XMFLOAT3(0, -1 * deltaTime, 0));
+	entities[1].get()->GetTransform()->Rotate(DirectX::XMFLOAT3(0, 1 * deltaTime, 0));
+	entities[2].get()->GetTransform()->Rotate(DirectX::XMFLOAT3(0, -1 * deltaTime, 0));
 	entities[0].get()->GetTransform()->MoveRelative(DirectX::XMFLOAT3(0, (float)sin(totalTime) * deltaTime, 0));
 }
 
@@ -313,7 +312,7 @@ void Game::Draw(float deltaTime, float totalTime)
 
 		for (int i = 0; i < entities.size(); i++) 
 		{
-			RayTracing::CreateTopLevelAccelerationStructureForScene(entities[i]);
+			RayTracing::CreateTopLevelAccelerationStructureForScene(entities);
 			RayTracing::Raytrace(cam, currentBackBuffer);
 		}
 	// Present
