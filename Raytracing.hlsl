@@ -189,5 +189,4 @@ void ClosestHit(inout RayPayload payload, BuiltInTriangleIntersectionAttributes 
     EntityData thisEntity = entityDataBuffer[InstanceIndex()];
 	
     payload.color = thisEntity.Color.rgb;
-
 }

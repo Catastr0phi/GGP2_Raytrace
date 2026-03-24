@@ -30,3 +30,19 @@ struct RaytracingSceneData
 	DirectX::XMFLOAT3 CameraPosition;
 	float pad;
 };
+
+struct RaytracingDrawData
+{
+	unsigned int SceneDataConstantBufferIndex;
+	unsigned int EntityDataDescriptorIndex;
+	unsigned int SceneTLASDescriptorIndex;
+	unsigned int OutputUAVDescriptorIndex;
+};
+
+struct RaytracingEntityData
+{
+	DirectX::XMFLOAT4 color;
+	unsigned int VertexBufferDescriptorIndex;
+	unsigned int IndexBufferDescriptorIndex;
+	float pad[2];
+};
