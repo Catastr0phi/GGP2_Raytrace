@@ -600,7 +600,7 @@ void RayTracing::CreateTopLevelAccelerationStructureForScene(std::vector<std::sh
 	// Copy the description(s) into the new buffer
 	unsigned char* mapped = 0;
 	TLASInstanceDescBuffer[frameIndex]->Map(0, 0, (void**)&mapped);
-	memcpy(mapped, &descs, (sizeof(D3D12_RAYTRACING_INSTANCE_DESC) * descs.size()));
+	memcpy(mapped, &descs[0], (sizeof(D3D12_RAYTRACING_INSTANCE_DESC) * descs.size()));
 	TLASInstanceDescBuffer[frameIndex]->Unmap(0, 0);
 
 	// Describe our overall input so we can get sizing info
@@ -608,7 +608,7 @@ void RayTracing::CreateTopLevelAccelerationStructureForScene(std::vector<std::sh
 	accelStructInputs.Type = D3D12_RAYTRACING_ACCELERATION_STRUCTURE_TYPE_TOP_LEVEL;
 	accelStructInputs.DescsLayout = D3D12_ELEMENTS_LAYOUT_ARRAY;
 	accelStructInputs.InstanceDescs = TLASInstanceDescBuffer[frameIndex]->GetGPUVirtualAddress();
-	accelStructInputs.NumDescs = descs.size();
+	accelStructInputs.NumDescs = (UINT)descs.size();
 	accelStructInputs.Flags = D3D12_RAYTRACING_ACCELERATION_STRUCTURE_BUILD_FLAG_PREFER_FAST_TRACE;
 
 	D3D12_RAYTRACING_ACCELERATION_STRUCTURE_PREBUILD_INFO accelStructPrebuildInfo = {};

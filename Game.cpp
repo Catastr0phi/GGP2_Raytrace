@@ -10,6 +10,7 @@
 #include "RayTracing.h"
 
 #include <DirectXMath.h>
+#include <random>
 
 // Needed for a helper function to load pre-compiled shader files
 #pragma comment(lib, "d3dcompiler.lib")
@@ -128,49 +129,26 @@ void Game::CreateGeometry()
 	meshes.push_back(torus);
 	meshes.push_back(helix);
 
-	// Create textures
-	UINT32 cobbleAlbedo = Graphics::LoadTexture(FixPath(L"../../Assets/Textures/PBR/cobblestone_albedo.png").c_str());
-	UINT32 cobbleNormal = Graphics::LoadTexture(FixPath(L"../../Assets/Textures/PBR/cobblestone_normals.png").c_str());
-	UINT32 cobbleRoughness = Graphics::LoadTexture(FixPath(L"../../Assets/Textures/PBR/cobblestone_roughness.png").c_str());
-	UINT32 cobbleMetallic = Graphics::LoadTexture(FixPath(L"../../Assets/Textures/PBR/cobblestone_metal.png").c_str());
+	std::shared_ptr<Material> floorMat = std::make_shared<Material>(pipelineState, DirectX::XMFLOAT3(0.7f, 0.7f, 0.8f));
+	entities.push_back(std::make_shared<GameEntity>(cube, floorMat));
 
-	UINT32 floorAlbedo = Graphics::LoadTexture(FixPath(L"../../Assets/Textures/PBR/floor_albedo.png").c_str());
-	UINT32 floorNormal = Graphics::LoadTexture(FixPath(L"../../Assets/Textures/PBR/floor_normals.png").c_str());
-	UINT32 floorRoughness = Graphics::LoadTexture(FixPath(L"../../Assets/Textures/PBR/floor_roughness.png").c_str());
-	UINT32 floorMetallic = Graphics::LoadTexture(FixPath(L"../../Assets/Textures/PBR/floor_metal.png").c_str());
+	entities[0].get()->GetTransform()->Scale(100, 100, 100);
+	entities[0].get()->GetTransform()->MoveAbsolute(0, -110, 0);
 
-	UINT32 woodAlbedo = Graphics::LoadTexture(FixPath(L"../../Assets/Textures/PBR/wood_albedo.png").c_str());
-	UINT32 woodNormal = Graphics::LoadTexture(FixPath(L"../../Assets/Textures/PBR/wood_normals.png").c_str());
-	UINT32 woodRoughness = Graphics::LoadTexture(FixPath(L"../../Assets/Textures/PBR/wood_roughness.png").c_str());
-	UINT32 woodMetallic = Graphics::LoadTexture(FixPath(L"../../Assets/Textures/PBR/wood_metal.png").c_str());
+	// Random setup
+	std::random_device rd;
+	std::mt19937 gen(rd());
+	std::uniform_real_distribution<> randDouble(0, 1);
+	std::uniform_int_distribution<> randInt(0, 4);
 
-	// Create materials
-	std::shared_ptr<Material> cobbleMat = std::make_shared<Material>(pipelineState, DirectX::XMFLOAT3(1, 1, 1));
-	cobbleMat->SetTextureIndex(cobbleAlbedo);
-	cobbleMat->SetTextureIndex(cobbleNormal);
-	cobbleMat->SetTextureIndex(cobbleRoughness);
-	cobbleMat->SetTextureIndex(cobbleMetallic);
+	for (int i = 0; i < 20; i++) {
+		std::shared_ptr<Material> newMat = std::make_shared<Material>(pipelineState, DirectX::XMFLOAT3((float)randDouble(gen), (float)randDouble(gen), (float)randDouble(gen)));
 
-	std::shared_ptr<Material> floorMat = std::make_shared<Material>(pipelineState, DirectX::XMFLOAT3(1, 1, 1));
-	floorMat->SetTextureIndex(floorAlbedo);
-	floorMat->SetTextureIndex(floorNormal);
-	floorMat->SetTextureIndex(floorRoughness);
-	floorMat->SetTextureIndex(floorMetallic);
+		entities.push_back(std::make_shared<GameEntity>(meshes[randInt(gen)], newMat));
 
-	std::shared_ptr<Material> woodMat = std::make_shared<Material>(pipelineState, DirectX::XMFLOAT3(1, 1, 1));
-	woodMat->SetTextureIndex(woodAlbedo);
-	woodMat->SetTextureIndex(woodNormal);
-	woodMat->SetTextureIndex(woodRoughness);
-	woodMat->SetTextureIndex(woodMetallic);
-
-	// Create entities
-	entities.push_back(std::make_shared<GameEntity>(cube, cobbleMat));
-	entities.push_back(std::make_shared<GameEntity>(sphere, floorMat));
-	entities.push_back(std::make_shared<GameEntity>(helix, woodMat));
-
-	entities[0].get()->GetTransform()->MoveAbsolute(5, 0, 5);
-	entities[1].get()->GetTransform()->MoveAbsolute(0, 0, 5);
-	entities[2].get()->GetTransform()->MoveAbsolute(-5, 0, 5);
+		entities[i + 1].get()->GetTransform()->MoveAbsolute((float)((randDouble(gen) * 2.0 - 1) * 20), -5, 5 + (float)((randDouble(gen) * 2.0 - 1) * 20));
+		//(randDouble(gen)/2 - 1) * 20
+	}
 
 	RayTracing::CreateEntityDataBuffer(entities);
 	RayTracing::CreateTopLevelAccelerationStructureForScene(entities);
@@ -294,9 +272,10 @@ void Game::Update(float deltaTime, float totalTime)
 
 	cam->Update(deltaTime);
 
-	entities[1].get()->GetTransform()->Rotate(DirectX::XMFLOAT3(0, 1 * deltaTime, 0));
-	entities[2].get()->GetTransform()->Rotate(DirectX::XMFLOAT3(0, -1 * deltaTime, 0));
-	entities[0].get()->GetTransform()->MoveRelative(DirectX::XMFLOAT3(0, (float)sin(totalTime) * deltaTime, 0));
+	for (int i = 1; i < entities.size(); i++) {
+		entities[i].get()->GetTransform()->Rotate(i * deltaTime,0,i * deltaTime);
+		entities[i].get()->GetTransform()->MoveAbsolute(DirectX::XMFLOAT3(0, (float)sin(totalTime) * i * deltaTime, 0));
+	}
 }
 
 
