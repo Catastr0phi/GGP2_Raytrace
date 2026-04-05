@@ -1,6 +1,6 @@
 #include "Material.h"
 
-Material::Material(Microsoft::WRL::ComPtr<ID3D12PipelineState> pipelineState, DirectX::XMFLOAT3 tint, DirectX::XMFLOAT2 uvScale, DirectX::XMFLOAT2 uvOffset)
+Material::Material(Microsoft::WRL::ComPtr<ID3D12PipelineState> pipelineState, DirectX::XMFLOAT4 tint, DirectX::XMFLOAT2 uvScale, DirectX::XMFLOAT2 uvOffset)
 	: pipelineState(pipelineState),
 	colorTint(tint),
 	uvScale(uvScale),
@@ -8,7 +8,7 @@ Material::Material(Microsoft::WRL::ComPtr<ID3D12PipelineState> pipelineState, Di
 {
 }
 
-DirectX::XMFLOAT3 Material::GetColorTint()
+DirectX::XMFLOAT4 Material::GetColorTint()
 {
 	return colorTint;
 }
@@ -38,7 +38,7 @@ UINT32* Material::GetTextureIndices()
 	return &textureIndices[0];
 }
 
-void Material::SetColorTint(DirectX::XMFLOAT3 newTint)
+void Material::SetColorTint(DirectX::XMFLOAT4 newTint)
 {
 	colorTint = newTint;
 }

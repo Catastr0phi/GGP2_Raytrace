@@ -129,7 +129,7 @@ void Game::CreateGeometry()
 	meshes.push_back(torus);
 	meshes.push_back(helix);
 
-	std::shared_ptr<Material> floorMat = std::make_shared<Material>(pipelineState, DirectX::XMFLOAT3(0.7f, 0.7f, 0.8f));
+	std::shared_ptr<Material> floorMat = std::make_shared<Material>(pipelineState, DirectX::XMFLOAT4(0.7f, 0.7f, 0.8f,0.1f));
 	entities.push_back(std::make_shared<GameEntity>(cube, floorMat));
 
 	entities[0].get()->GetTransform()->Scale(100, 100, 100);
@@ -142,7 +142,7 @@ void Game::CreateGeometry()
 	std::uniform_int_distribution<> randInt(0, 4);
 
 	for (int i = 0; i < 20; i++) {
-		std::shared_ptr<Material> newMat = std::make_shared<Material>(pipelineState, DirectX::XMFLOAT3((float)randDouble(gen), (float)randDouble(gen), (float)randDouble(gen)));
+		std::shared_ptr<Material> newMat = std::make_shared<Material>(pipelineState, DirectX::XMFLOAT4((float)randDouble(gen), (float)randDouble(gen), (float)randDouble(gen), (float)randDouble(gen)));
 
 		entities.push_back(std::make_shared<GameEntity>(meshes[randInt(gen)], newMat));
 
@@ -314,6 +314,7 @@ void Game::Draw(float deltaTime, float totalTime)
 
 		Graphics::AdvanceSwapChainIndex();
 
+		Graphics::WaitForGPU();
 		Graphics::ResetAllocatorAndCommandList(Graphics::SwapChainIndex());
 	}
 }

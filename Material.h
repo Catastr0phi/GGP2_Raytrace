@@ -14,7 +14,7 @@ class Material
 {
 	// Private variables
 private:
-	DirectX::XMFLOAT3 colorTint;
+	DirectX::XMFLOAT4 colorTint;
 	DirectX::XMFLOAT2 uvScale;
 	DirectX::XMFLOAT2 uvOffset;
 
@@ -27,12 +27,12 @@ private:
 public:
 	// Constructor
 	Material(Microsoft::WRL::ComPtr<ID3D12PipelineState> pipelineState,
-		DirectX::XMFLOAT3 tint,
+		DirectX::XMFLOAT4 tint,
 		DirectX::XMFLOAT2 uvScale = DirectX::XMFLOAT2(1, 1),
 		DirectX::XMFLOAT2 uvOffset = DirectX::XMFLOAT2(0, 0));
 
 	// Getters
-	DirectX::XMFLOAT3 GetColorTint();
+	DirectX::XMFLOAT4 GetColorTint();
 	DirectX::XMFLOAT2 GetUVScale();
 	DirectX::XMFLOAT2 GetUVOffset();
 	Microsoft::WRL::ComPtr<ID3D12PipelineState> GetPipelineState();
@@ -45,7 +45,7 @@ public:
 	UINT32* GetTextureIndices();
 
 	// Setters
-	void SetColorTint(DirectX::XMFLOAT3 newTint);
+	void SetColorTint(DirectX::XMFLOAT4 newTint);
 	void SetUVScale(DirectX::XMFLOAT2 newScale);
 	void SetUVOffset(DirectX::XMFLOAT2 newOffset);
 	void SetPipelineState(Microsoft::WRL::ComPtr<ID3D12PipelineState> newPState);
