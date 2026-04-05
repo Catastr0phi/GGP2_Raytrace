@@ -157,6 +157,14 @@ RayDesc CalcRayFromCamera(float2 rayIndices, float3 camPos, float4x4 invVP)
     return ray;
 }
 
+// Schlicks approximation
+float reflectance(float cosine, float refractionIndex)
+{   
+    float r0 = (1 - refractionIndex) / (1 + refractionIndex);
+    r0 = r0 * r0;
+    return r0 + (1 - r0) * pow((1 - cosine), 5);
+}
+
 
 // === Shaders ===
 
@@ -240,7 +248,7 @@ void ClosestHit(inout RayPayload payload, BuiltInTriangleIntersectionAttributes 
 	// Use the resulting data to set the final color
 	// Note: Here is where we would do actual shading!
 	//payload.color = interpolatedVert.normal;
-    if (payload.RecursionDepth == 10)
+    if (payload.RecursionDepth == 30)
     {
         payload.color = float3(0, 0, 0);
         return;
@@ -261,9 +269,20 @@ void ClosestHit(inout RayPayload payload, BuiltInTriangleIntersectionAttributes 
     RayTCurrent());
     
     // Interpolate between full diffuse and full reflect
-    float3 refl = reflect(WorldRayDirection(), normal_WS);
+    //float3 refl = reflect(WorldRayDirection(), normal_WS);
+    //float3 refl = refract(WorldRayDirection(), normal_WS, 1);
+    
+    float dotProd = dot(WorldRayDirection(), normal_WS);
+    bool frontFace = dotProd < 0;
+    float refractionIndex = 1.5;
+    
+    if (!frontFace)
+    {
+        refractionIndex = 1 / refractionIndex;
+    }
+    float3 refl = refract(WorldRayDirection(), normal_WS, refractionIndex);
     float3 randomBounce = RandomInHemisphere(rand(rng), rand(rng.yx), normal_WS);
-    float3 dir = normalize(lerp(refl, randomBounce, thisEntity.Color.a));
+    float3 dir = normalize(lerp(refl, refl, thisEntity.Color.a));
     
     RayDesc ray;
     ray.Origin = WorldRayOrigin() + WorldRayDirection() * RayTCurrent();

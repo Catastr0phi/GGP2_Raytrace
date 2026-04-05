@@ -129,7 +129,7 @@ void Game::CreateGeometry()
 	meshes.push_back(torus);
 	meshes.push_back(helix);
 
-	std::shared_ptr<Material> floorMat = std::make_shared<Material>(pipelineState, DirectX::XMFLOAT4(0.7f, 0.7f, 0.8f,0.1f));
+	std::shared_ptr<Material> floorMat = std::make_shared<Material>(pipelineState, DirectX::XMFLOAT4(0.7f, 0.7f, 0.8f,1.0f));
 	entities.push_back(std::make_shared<GameEntity>(cube, floorMat));
 
 	entities[0].get()->GetTransform()->Scale(100, 100, 100);
