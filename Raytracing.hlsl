@@ -182,7 +182,7 @@ void RayGen()
 	
     float3 totalColor = float3(0, 0, 0);
 	
-    int raysPerPixel = 10;
+    int raysPerPixel = 3;
     for (int r = 0; r < raysPerPixel; r++)
     {
         float2 adjustedIndices = (float2) rayIndices;
@@ -248,16 +248,17 @@ void ClosestHit(inout RayPayload payload, BuiltInTriangleIntersectionAttributes 
 	// Use the resulting data to set the final color
 	// Note: Here is where we would do actual shading!
 	//payload.color = interpolatedVert.normal;
-    if (payload.RecursionDepth == 30)
+    if (payload.RecursionDepth == 10)
     {
         payload.color = float3(0, 0, 0);
         return;
     }
+
 	
     StructuredBuffer<EntityData> entityDataBuffer =
 		ResourceDescriptorHeap[EntityDataDescriptorIndex];
     EntityData thisEntity = entityDataBuffer[InstanceIndex()];
-	
+    
     payload.color *= thisEntity.Color.rgb;
     
     Vertex hit = InterpolateVertices(PrimitiveIndex(), hitAttributes.barycentrics);
@@ -268,21 +269,40 @@ void ClosestHit(inout RayPayload payload, BuiltInTriangleIntersectionAttributes 
     payload.RayPerPixelIndex +
     RayTCurrent());
     
-    // Interpolate between full diffuse and full reflect
-    //float3 refl = reflect(WorldRayDirection(), normal_WS);
-    //float3 refl = refract(WorldRayDirection(), normal_WS, 1);
+    // Get reflect ray
+    float3 refl = reflect(WorldRayDirection(), normal_WS);
     
+    // Get refract ray
+    // This is pretty badly optimized, my main concern is just getting it functional
+    float3 refractRay;
     float dotProd = dot(WorldRayDirection(), normal_WS);
     bool frontFace = dotProd < 0;
-    float refractionIndex = 1.5;
+    float refractionIndex = 1.5f;
     
-    if (!frontFace)
+    if (frontFace)
     {
-        refractionIndex = 1 / refractionIndex;
+        refractionIndex = 1.0f / refractionIndex;
+        refractRay = refract(normalize(WorldRayDirection()), normal_WS, refractionIndex);
     }
-    float3 refl = refract(WorldRayDirection(), normal_WS, refractionIndex);
+    else
+    {
+        refractRay = refract(normalize(WorldRayDirection()), -normal_WS, refractionIndex);
+    }
+
+    // Get random bounce (diffuse)
     float3 randomBounce = RandomInHemisphere(rand(rng), rand(rng.yx), normal_WS);
-    float3 dir = normalize(lerp(refl, refl, thisEntity.Color.a));
+    float3 dir;
+    
+    // Full refract or interpolating between diffuse and reflect
+    // Again, horrible for optimization, but it works
+    if (thisEntity.Color.a < 0.5)
+    {
+        dir = refractRay;
+    }
+    else
+    {
+        dir = normalize(lerp(refl, randomBounce, (thisEntity.Color.a - 0.5) * 2));
+    }
     
     RayDesc ray;
     ray.Origin = WorldRayOrigin() + WorldRayDirection() * RayTCurrent();

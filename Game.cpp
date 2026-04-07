@@ -142,11 +142,12 @@ void Game::CreateGeometry()
 	std::uniform_int_distribution<> randInt(0, 4);
 
 	for (int i = 0; i < 20; i++) {
-		std::shared_ptr<Material> newMat = std::make_shared<Material>(pipelineState, DirectX::XMFLOAT4((float)randDouble(gen), (float)randDouble(gen), (float)randDouble(gen), (float)randDouble(gen)));
+		float a = (float)randDouble(gen);
+		std::shared_ptr<Material> newMat = std::make_shared<Material>(pipelineState, DirectX::XMFLOAT4((float)randDouble(gen), (float)randDouble(gen), (float)randDouble(gen), a));
 
 		entities.push_back(std::make_shared<GameEntity>(meshes[randInt(gen)], newMat));
 
-		entities[i + 1].get()->GetTransform()->MoveAbsolute((float)((randDouble(gen) * 2.0 - 1) * 20), -5, 5 + (float)((randDouble(gen) * 2.0 - 1) * 20));
+		entities[i + 1].get()->GetTransform()->MoveAbsolute((float)((randDouble(gen) * 2.0 - 1) * 20), -8, 5 + (float)((randDouble(gen) * 2.0 - 1) * 20));
 		//(randDouble(gen)/2 - 1) * 20
 	}
 
@@ -273,8 +274,8 @@ void Game::Update(float deltaTime, float totalTime)
 	cam->Update(deltaTime);
 
 	for (int i = 1; i < entities.size(); i++) {
-		entities[i].get()->GetTransform()->Rotate(i * deltaTime,0,i * deltaTime);
-		entities[i].get()->GetTransform()->MoveAbsolute(DirectX::XMFLOAT3(0, (float)sin(totalTime) * i * deltaTime, 0));
+		entities[i].get()->GetTransform()->Rotate(i * deltaTime/10,0,i * deltaTime/10);
+	    entities[i].get()->GetTransform()->MoveAbsolute(DirectX::XMFLOAT3((float)sin(totalTime) * i * deltaTime / 10, 0, 0));
 	}
 }
 
